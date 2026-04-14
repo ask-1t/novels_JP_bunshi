@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- タイトルは app.js が NOVEL_META.title で上書きします -->
+  <title>読書</title>
+
+  <!-- 拡散対策: 検索エンジンへのインデックス抑制 -->
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- OGP / SNS 連携は不要のため未記述 -->
+
+  <!-- フォント & スタイル -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500&family=Noto+Sans+JP:wght@300;400&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="style.css">
+
+  <!-- テーマちらつき防止: DOMContentLoaded より前に適用 -->
+  <script>
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem("novel_reader_state") || "{}");
+        var t = s.theme || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (_) {}
+    })();
+  </script>
+</head>
+<body>
+<div id="app">
+
+  <!-- ============================================================
+       ヘッダー
+       ============================================================ -->
+  <header class="site-header" role="banner">
+    <span id="site-title" class="site-title" aria-label="作品タイトル">読書</span>
+
+    <nav class="header-controls" aria-label="読書ツール">
+      <!-- しおりボタン -->
+      <button
+        id="bookmark-btn"
+        class="icon-btn"
+        type="button"
+        title="しおりを挟む（現在位置を保存）"
+        aria-label="しおりを挟む"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+        </svg>
+      </button>
+
+      <!-- 読書設定ボタン -->
+      <button
+        id="settings-toggle"
+        class="icon-btn"
+        type="button"
+        title="読書設定"
+        aria-label="読書設定を開く"
+        aria-expanded="false"
+        aria-controls="settings-panel"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+          <line x1="12" y1="2" x2="12" y2="5"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+          <line x1="2" y1="12" x2="5" y2="12"/>
+          <line x1="19" y1="12" x2="22" y2="12"/>
+        </svg>
+      </button>
+
+      <!-- 目次ボタン -->
+      <button
+        id="toc-toggle"
+        class="icon-btn"
+        type="button"
+        title="目次"
+        aria-label="目次を開く"
+        aria-expanded="false"
+        aria-controls="toc-panel"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- ============================================================
+       目次パネル（ドロワー）
+       ============================================================ -->
+  <div id="toc-overlay" class="toc-overlay" role="dialog" aria-modal="true" aria-label="目次">
+    <nav id="toc-panel" class="toc-panel">
+      <div class="toc-header">
+        <span class="toc-label">目　次</span>
+        <button id="toc-close" class="toc-close-btn" type="button" aria-label="目次を閉じる">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <ul id="toc-list" class="toc-list" role="list">
+        <!-- app.js が動的生成 -->
+      </ul>
+    </nav>
+  </div>
+
+  <!-- ============================================================
+       読書設定パネル
+       ============================================================ -->
+  <div id="settings-panel" class="settings-panel" role="region" aria-label="読書設定">
+
+    <!-- テーマ -->
+    <div class="settings-section">
+      <span class="settings-label">テーマ</span>
+      <div class="theme-buttons">
+        <button class="theme-btn active" id="theme-light" data-theme="light" type="button">ライト</button>
+        <button class="theme-btn" id="theme-dark"  data-theme="dark"  type="button">ダーク</button>
+        <button class="theme-btn" id="theme-sepia" data-theme="sepia" type="button">セピア</button>
+      </div>
+    </div>
+
+    <div class="divider-line"></div>
+
+    <!-- 文字サイズ -->
+    <div class="settings-section">
+      <span class="settings-label">文字サイズ</span>
+      <div class="settings-slider-row">
+        <input
+          type="range" id="font-size-slider" class="settings-slider"
+          min="0.85" max="1.5" step="0.05" value="1.1"
+          aria-label="文字サイズ"
+        >
+        <span id="font-size-val" class="slider-val">1.1</span>
+      </div>
+    </div>
+
+    <!-- 行間 -->
+    <div class="settings-section">
+      <span class="settings-label">行　間</span>
+      <div class="settings-slider-row">
+        <input
+          type="range" id="line-height-slider" class="settings-slider"
+          min="1.6" max="2.8" step="0.1" value="2.1"
+          aria-label="行間"
+        >
+        <span id="line-height-val" class="slider-val">2.1</span>
+      </div>
+    </div>
+
+    <!-- 本文幅 -->
+    <div class="settings-section">
+      <span class="settings-label">本文幅</span>
+      <div class="settings-slider-row">
+        <input
+          type="range" id="max-width-slider" class="settings-slider"
+          min="400" max="900" step="20" value="640"
+          aria-label="本文幅"
+        >
+        <span id="max-width-val" class="slider-val">640px</span>
+      </div>
+    </div>
+
+    <div class="divider-line"></div>
+
+    <!-- ルビ -->
+    <div class="settings-section">
+      <div class="toggle-row">
+        <span class="toggle-label-text">ルビを表示</span>
+        <label class="toggle-switch" aria-label="ルビ表示の切替">
+          <input type="checkbox" id="ruby-toggle" checked>
+          <span class="toggle-track" aria-hidden="true"></span>
+        </label>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       メイン読書エリア
+       ============================================================ -->
+  <main class="reading-container" role="main" id="main-content">
+    <article class="reading-inner">
+
+      <header class="chapter-header">
+        <p id="chapter-number" class="chapter-number" aria-live="polite"></p>
+        <h1 id="chapter-title" class="chapter-title"></h1>
+      </header>
+
+      <!-- 本文（app.js が動的生成） -->
+      <div id="chapter-body" class="chapter-body" role="article" aria-label="本文"></div>
+
+      <!-- 章ナビゲーション -->
+      <nav class="chapter-nav" aria-label="章の移動">
+        <button id="prev-chapter" class="chapter-nav-btn prev" type="button" aria-label="前の章">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          <span id="prev-label"></span>
+        </button>
+        <button id="next-chapter" class="chapter-nav-btn next" type="button" aria-label="次の章">
+          <span id="next-label"></span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+      </nav>
+
+    </article>
+  </main>
+
+  <!-- ============================================================
+       フッター
+       ============================================================ -->
+  <footer class="site-footer" role="contentinfo">
+    <span id="footer-author"></span>
+  </footer>
+
+</div><!-- /#app -->
+
+<!-- しおりトースト -->
+<div id="bookmark-toast" class="bookmark-toast" aria-live="polite" aria-atomic="true"></div>
+
+<!-- 本文データ -->
+<script src="content.js"></script>
+<!-- アプリロジック -->
+<script src="app.js"></script>
+
+<!-- フッター作者名設定 -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var el = document.getElementById("footer-author");
+    if (el && window.NOVEL_META && window.NOVEL_META.author) {
+      el.textContent = window.NOVEL_META.author;
+    }
+  });
+</script>
+<script data-pplx-inline-edit>
+(function(){
+  if(window===window.top)return;
+  function inlineAll(orig,clone){
+    if(orig.nodeType!==1)return;
+    try{
+      var cs=getComputedStyle(orig);
+      var t='';
+      for(var i=0;i<cs.length;i++){t+=cs[i]+':'+cs.getPropertyValue(cs[i])+';';}
+      clone.style.cssText=t;
+    }catch(e){}
+    var oc=orig.children,cc=clone.children;
+    for(var j=0;j<oc.length&&j<cc.length;j++){inlineAll(oc[j],cc[j]);}
+  }
+  function stripExternal(clone){
+    var imgs=clone.querySelectorAll('img');
+    for(var i=0;i<imgs.length;i++){
+      var s=imgs[i].getAttribute('src');
+      if(s&&!s.startsWith('data:'))imgs[i].removeAttribute('src');
+    }
+    var all=clone.querySelectorAll('*');
+    for(var i=0;i<all.length;i++){
+      var st=all[i].style.cssText;
+      if(st&&st.indexOf('url(')>=0){
+        all[i].style.cssText=st.replace(/url\(["']?(?!data:)[^)"']*["']?\)/gi,'none');
+      }
+    }
+  }
+  window.addEventListener('message',function(e){
+    if(!e.data||e.data.type!=='INLINE_EDIT_CAPTURE_REQUEST')return;
+    var scrollX=window.scrollX||window.pageXOffset||0;
+    var scrollY=window.scrollY||window.pageYOffset||0;
+    var w=window.innerWidth,h=window.innerHeight;
+    try{
+      var clone=document.documentElement.cloneNode(true);
+      var rm=clone.querySelectorAll('script,link[rel="stylesheet"],style');
+      for(var i=0;i<rm.length;i++){rm[i].remove();}
+      inlineAll(document.documentElement,clone);
+      stripExternal(clone);
+      var html=new XMLSerializer().serializeToString(clone);
+      var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">'
+        +'<foreignObject width="100%" height="100%">'
+        +'<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+w+'px;height:'+h+'px;overflow:hidden">'
+        +'<div style="transform:translate(-'+scrollX+'px,-'+scrollY+'px);transform-origin:top left">'
+        +html+'</div></div></foreignObject></svg>';
+      var svgUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+      var img=new Image();
+      img.onload=function(){
+        var c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0);
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:c.toDataURL('image/png'),scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.onerror=function(){
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.src=svgUrl;
+    }catch(err){
+      window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+    }
+  });
+})();
+</script></body>
+</html>

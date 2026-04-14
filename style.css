@@ -1,0 +1,687 @@
+/* ================================================================
+   style.css — 日本語小説読書アプリ
+   ================================================================ */
+
+/* ----------------------------------------------------------------
+   フォント読み込み
+   本文: Noto Serif JP（日本語組版に適した明朝体）
+   UI: Noto Sans JP（UIラベル用）
+   ---------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500&family=Noto+Sans+JP:wght@300;400&display=swap');
+
+/* ----------------------------------------------------------------
+   デザイントークン（テーマ変数）
+   ---------------------------------------------------------------- */
+
+/* ライトテーマ（デフォルト） */
+:root,
+[data-theme="light"] {
+  --color-bg:           #faf9f6;
+  --color-surface:      #f5f3ee;
+  --color-divider:      #dedad4;
+  --color-border:       #ccc9c2;
+
+  --color-text:         #2a2620;
+  --color-text-muted:   #7a776f;
+  --color-text-faint:   #b8b5ae;
+  --color-text-ui:      #5a5750;
+
+  --color-accent:       #5a6e5a;
+
+  --shadow-panel: 0 1px 8px oklch(0.2 0.01 80 / 0.07);
+
+  /* 読書設定のデフォルト（JSで上書き可能） */
+  --reading-font-size:  1.1rem;
+  --reading-line-height: 2.1;
+  --reading-max-width:  640px;
+}
+
+/* ダークテーマ */
+[data-theme="dark"] {
+  --color-bg:           #171614;
+  --color-surface:      #1f1e1b;
+  --color-divider:      #2e2d2a;
+  --color-border:       #3a3936;
+
+  --color-text:         #cdc9c1;
+  --color-text-muted:   #7a7872;
+  --color-text-faint:   #4f4e4b;
+  --color-text-ui:      #9a9891;
+
+  --color-accent:       #7a9a7a;
+
+  --shadow-panel: 0 1px 8px oklch(0 0 0 / 0.25);
+}
+
+/* セピアテーマ */
+[data-theme="sepia"] {
+  --color-bg:           #f4ede0;
+  --color-surface:      #ece4d4;
+  --color-divider:      #d4c8b0;
+  --color-border:       #c8bbA0;
+
+  --color-text:         #362d1e;
+  --color-text-muted:   #7a6a52;
+  --color-text-faint:   #b8a888;
+  --color-text-ui:      #6a5a42;
+
+  --color-accent:       #7a6040;
+
+  --shadow-panel: 0 1px 8px oklch(0.3 0.05 60 / 0.1);
+}
+
+/* システム設定フォールバック */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --color-bg:           #171614;
+    --color-surface:      #1f1e1b;
+    --color-divider:      #2e2d2a;
+    --color-border:       #3a3936;
+    --color-text:         #cdc9c1;
+    --color-text-muted:   #7a7872;
+    --color-text-faint:   #4f4e4b;
+    --color-text-ui:      #9a9891;
+    --color-accent:       #7a9a7a;
+    --shadow-panel: 0 1px 8px oklch(0 0 0 / 0.25);
+  }
+}
+
+/* ----------------------------------------------------------------
+   ベースリセット
+   ---------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  scroll-padding-top: 3rem;
+  hanging-punctuation: first last;
+}
+
+body {
+  min-height: 100dvh;
+  font-family: 'Noto Serif JP', 'Yu Mincho', '游明朝', serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.8;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  transition: background-color 0.25s, color 0.25s;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+:focus-visible {
+  outline: 1.5px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ----------------------------------------------------------------
+   レイアウト
+   ---------------------------------------------------------------- */
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* ヘッダー */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-divider);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: background-color 0.25s, border-color 0.25s;
+}
+
+.site-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  font-weight: 400;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+/* 小さなアイコンボタン */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 4px;
+  color: var(--color-text-muted);
+  transition: color 0.18s, background 0.18s;
+}
+
+.icon-btn:hover {
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.icon-btn svg {
+  display: block;
+}
+
+/* ----------------------------------------------------------------
+   目次パネル（ドロワー式）
+   ---------------------------------------------------------------- */
+.toc-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: oklch(0 0 0 / 0.25);
+  z-index: 200;
+}
+
+.toc-overlay.open {
+  display: block;
+}
+
+.toc-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(280px, 80vw);
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  z-index: 201;
+  transform: translateX(-100%);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 0;
+  box-shadow: var(--shadow-panel);
+}
+
+.toc-overlay.open .toc-panel {
+  transform: translateX(0);
+}
+
+.toc-header {
+  padding: 0 1.5rem 1rem;
+  border-bottom: 1px solid var(--color-divider);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toc-label {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.75rem;
+  color: var(--color-text-faint);
+  letter-spacing: 0.1em;
+}
+
+.toc-close-btn {
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 3px;
+  transition: color 0.15s;
+}
+.toc-close-btn:hover { color: var(--color-text); }
+
+.toc-list {
+  list-style: none;
+  overflow-y: auto;
+  flex: 1;
+  padding: 0 1rem;
+}
+
+.toc-item {
+  margin-bottom: 0.15rem;
+}
+
+.toc-link {
+  display: block;
+  padding: 0.55rem 0.75rem;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+  line-height: 1.5;
+}
+
+.toc-link:hover {
+  color: var(--color-text);
+  background: var(--color-divider);
+}
+
+.toc-link.active {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+/* ----------------------------------------------------------------
+   読書設定パネル
+   ---------------------------------------------------------------- */
+.settings-panel {
+  display: none;
+  position: fixed;
+  top: 3.5rem;
+  right: 1rem;
+  width: min(280px, calc(100vw - 2rem));
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-panel);
+  padding: 1.25rem;
+  z-index: 150;
+}
+
+.settings-panel.open {
+  display: block;
+}
+
+.settings-section {
+  margin-bottom: 1.25rem;
+}
+
+.settings-section:last-child {
+  margin-bottom: 0;
+}
+
+.settings-label {
+  display: block;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.72rem;
+  color: var(--color-text-faint);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.6rem;
+}
+
+/* テーマボタン */
+.theme-buttons {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.theme-btn {
+  flex: 1;
+  padding: 0.45rem 0.5rem;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  text-align: center;
+}
+
+.theme-btn:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+}
+
+.theme-btn.active {
+  color: var(--color-text);
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+
+/* スライダー系 */
+.settings-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.settings-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  background: var(--color-divider);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.settings-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.settings-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.settings-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: none;
+  cursor: pointer;
+}
+
+.slider-val {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.72rem;
+  color: var(--color-text-faint);
+  min-width: 2.2rem;
+  text-align: right;
+}
+
+/* ルビ・しおりトグル */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toggle-label-text {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.toggle-switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: var(--color-divider);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px oklch(0 0 0 / 0.2);
+}
+
+.toggle-switch input:checked + .toggle-track {
+  background: var(--color-accent);
+}
+
+.toggle-switch input:checked + .toggle-track::after {
+  transform: translateX(16px);
+}
+
+.divider-line {
+  height: 1px;
+  background: var(--color-divider);
+  margin: 1rem 0;
+}
+
+/* ----------------------------------------------------------------
+   メインコンテンツ（読書エリア）
+   ---------------------------------------------------------------- */
+.reading-container {
+  flex: 1;
+  padding: clamp(2rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem);
+}
+
+.reading-inner {
+  max-width: var(--reading-max-width, 640px);
+  margin: 0 auto;
+}
+
+/* 章ヘッダー */
+.chapter-header {
+  margin-bottom: clamp(2.5rem, 6vw, 4rem);
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.chapter-number {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.72rem;
+  color: var(--color-text-faint);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.75rem;
+}
+
+.chapter-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--color-text);
+  letter-spacing: 0.05em;
+}
+
+/* 本文 */
+.chapter-body {
+  font-family: 'Noto Serif JP', serif;
+  font-size: var(--reading-font-size, 1.1rem);
+  line-height: var(--reading-line-height, 2.1);
+  color: var(--color-text);
+  letter-spacing: 0.03em;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+
+/* 段落 */
+.chapter-body p {
+  text-indent: 1em;
+  margin-bottom: 0;
+  max-width: none;
+  text-wrap: pretty;
+}
+
+/* 段落間の行間 */
+.chapter-body p + p {
+  margin-top: calc(var(--reading-line-height, 2.1) * 0.5em);
+}
+
+/* 区切り記号 */
+.scene-break {
+  display: block;
+  text-align: center;
+  color: var(--color-text-faint);
+  font-size: 0.85rem;
+  letter-spacing: 0.4em;
+  margin: clamp(1.5rem, 4vw, 2.5rem) 0;
+  user-select: none;
+}
+
+/* ルビのスタイル */
+ruby {
+  ruby-align: center;
+}
+
+rt {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.5em;
+  color: var(--color-text-muted);
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+/* ルビ非表示 */
+.no-ruby rt {
+  display: none;
+}
+
+/* ----------------------------------------------------------------
+   章ナビゲーション
+   ---------------------------------------------------------------- */
+.chapter-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: clamp(3rem, 8vw, 5rem);
+  padding-top: 2rem;
+  border-top: 1px solid var(--color-divider);
+  gap: 1rem;
+}
+
+.chapter-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  padding: 0.6rem 0;
+  transition: color 0.15s;
+  max-width: 45%;
+}
+
+.chapter-nav-btn:hover {
+  color: var(--color-text);
+}
+
+.chapter-nav-btn.prev { text-align: left; }
+.chapter-nav-btn.next { 
+  text-align: right;
+  margin-left: auto;
+  flex-direction: row-reverse;
+}
+
+.chapter-nav-btn span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chapter-nav-btn:disabled,
+.chapter-nav-btn[aria-disabled="true"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ----------------------------------------------------------------
+   しおりトースト通知
+   ---------------------------------------------------------------- */
+.bookmark-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(1rem);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 0.65rem 1.25rem;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  box-shadow: var(--shadow-panel);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 300;
+  white-space: nowrap;
+}
+
+.bookmark-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ----------------------------------------------------------------
+   フッター
+   ---------------------------------------------------------------- */
+.site-footer {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: var(--color-text-faint);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  border-top: 1px solid var(--color-divider);
+}
+
+/* ----------------------------------------------------------------
+   レスポンシブ
+   ---------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .site-header {
+    padding: 0.6rem 1rem;
+  }
+
+  .settings-panel {
+    right: 0.75rem;
+    width: calc(100vw - 1.5rem);
+  }
+
+  .chapter-nav-btn span {
+    display: none;
+  }
+}
