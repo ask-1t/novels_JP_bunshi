@@ -141,26 +141,74 @@ async function loadMetadata() {
 
 async function loadNovel() {
   try {
-    const response = await fetch("data/novel.txt", { cache: "no-cache" });
-    if (!response.ok) {
-      throw new Error(`本文ファイルを読み込めませんでした: ${response.status}`);
-    }
-
-    const source = await response.text();
+    const source = await loadChapterSources();
     const { html, toc } = renderNovel(source);
 
-    els.novelBody.innerHTML = html || `<p class="error">本文が空です。<code>data/novel.txt</code> を編集してください。</p>`;
+    els.novelBody.innerHTML = html || `<p class="error">本文が空です。<code>data/chapters/01.txt</code> などを編集してください。</p>`;
     renderToc(toc);
   } catch (error) {
     els.novelBody.innerHTML = `
       <div class="error">
         <p>本文を読み込めませんでした。</p>
-        <p><code>data/novel.txt</code> が同じ場所にあるか確認してください。</p>
+        <p><code>data/chapters.json</code> と <code>data/chapters/01.txt</code> 〜 <code>09.txt</code> が同じ場所にあるか確認してください。</p>
         <p>ローカルで直接 <code>index.html</code> を開くと、ブラウザによっては本文ファイルの読み込みが制限されます。GitHub Pages上では通常どおり動きます。</p>
       </div>
     `;
     console.error(error);
   }
+}
+
+async function loadChapterSources() {
+  try {
+    const chapterResponse = await fetch("data/chapters.json", { cache: "no-cache" });
+    if (chapterResponse.ok) {
+      const rawChapters = await chapterResponse.json();
+      const chapters = normalizeChapters(rawChapters);
+
+      if (chapters.length) {
+        const sources = await Promise.all(chapters.map(loadOneChapter));
+        return sources.join("\n\n---\n\n");
+      }
+    }
+  } catch (error) {
+    console.warn("章分割版の読み込みに失敗しました。単一ファイル版を試します。", error);
+  }
+
+  const fallbackResponse = await fetch("data/novel.txt", { cache: "no-cache" });
+  if (!fallbackResponse.ok) {
+    throw new Error(`本文ファイルを読み込めませんでした: ${fallbackResponse.status}`);
+  }
+  return await fallbackResponse.text();
+}
+
+function normalizeChapters(rawChapters) {
+  const list = Array.isArray(rawChapters) ? rawChapters : rawChapters?.chapters;
+  if (!Array.isArray(list)) return [];
+
+  return list
+    .map((item, index) => {
+      if (typeof item === "string") {
+        return { title: `第${index + 1}章`, file: item };
+      }
+      return {
+        title: item?.title || `第${index + 1}章`,
+        file: item?.file || item?.path || "",
+      };
+    })
+    .filter((item) => item.file);
+}
+
+async function loadOneChapter(chapter) {
+  const filePath = chapter.file.startsWith("data/") ? chapter.file : `data/${chapter.file}`;
+  const response = await fetch(filePath, { cache: "no-cache" });
+
+  if (!response.ok) {
+    throw new Error(`${filePath} を読み込めませんでした: ${response.status}`);
+  }
+
+  const source = (await response.text()).replace(/\r\n?/g, "\n").trim();
+  const hasHeading = /^#{1,3}\s+.+/m.test(source);
+  return hasHeading ? source : `# ${chapter.title}\n\n${source}`;
 }
 
 function renderNovel(source) {
