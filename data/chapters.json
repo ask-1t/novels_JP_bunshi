@@ -1,0 +1,38 @@
+[
+  {
+    "title": "第1章　章タイトルをここに入れる",
+    "file": "chapters/01.txt"
+  },
+  {
+    "title": "第2章　章タイトルをここに入れる",
+    "file": "chapters/02.txt"
+  },
+  {
+    "title": "第3章　章タイトルをここに入れる",
+    "file": "chapters/03.txt"
+  },
+  {
+    "title": "第4章　章タイトルをここに入れる",
+    "file": "chapters/04.txt"
+  },
+  {
+    "title": "第5章　章タイトルをここに入れる",
+    "file": "chapters/05.txt"
+  },
+  {
+    "title": "第6章　章タイトルをここに入れる",
+    "file": "chapters/06.txt"
+  },
+  {
+    "title": "第7章　章タイトルをここに入れる",
+    "file": "chapters/07.txt"
+  },
+  {
+    "title": "第8章　章タイトルをここに入れる",
+    "file": "chapters/08.txt"
+  },
+  {
+    "title": "第9章　章タイトルをここに入れる",
+    "file": "chapters/09.txt"
+  }
+]
