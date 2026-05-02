@@ -22,6 +22,8 @@
   --line-height-vertical: 1.9;
   --content-width: 46rem;
   --reader-chrome-height: 5.6rem;
+  --viewport-height: 100dvh;
+  --vertical-edge-safe: 0.42em;
 }
 
 html[data-theme="dark"] {
@@ -177,7 +179,7 @@ body {
 
 .reader-frame {
   max-width: var(--content-width);
-  min-height: calc(100dvh - var(--reader-chrome-height));
+  min-height: calc(var(--viewport-height, 100dvh) - var(--reader-chrome-height));
   margin: 0 auto;
   padding: clamp(1.15rem, 3.2vw, 2.55rem);
   border: 1px solid var(--line);
@@ -268,18 +270,21 @@ html[data-writing="vertical"] .reader-meta {
 html[data-writing="vertical"] .reader-frame {
   width: calc(100vw - clamp(1rem, 4vw, 2.5rem));
   max-width: none;
-  height: calc(100dvh - var(--reader-chrome-height));
+  height: calc(var(--viewport-height, 100dvh) - var(--reader-chrome-height));
   min-height: 24rem;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   overscroll-behavior-inline: contain;
-  padding: clamp(1.1rem, 3vw, 2.2rem);
+  padding: clamp(1.15rem, 3vw, 2.25rem) clamp(1rem, 2.8vw, 2.2rem);
   scroll-snap-type: x proximity;
 }
 
 html[data-writing="vertical"] .novel-body {
+  box-sizing: border-box;
   width: max-content;
   height: 100%;
+  padding-top: var(--vertical-edge-safe);
+  padding-bottom: var(--vertical-edge-safe);
   writing-mode: vertical-rl;
   text-orientation: mixed;
   line-height: var(--line-height-vertical);
@@ -439,7 +444,7 @@ html[data-writing="vertical"] .site-footer {
   .reader-frame {
     width: 100%;
     max-width: none;
-    min-height: calc(100dvh - var(--reader-chrome-height));
+    min-height: calc(var(--viewport-height, 100dvh) - var(--reader-chrome-height));
     padding: 0.75rem 0.62rem;
     border-radius: 0.65rem;
     box-shadow: none;
@@ -449,35 +454,35 @@ html[data-writing="vertical"] .site-footer {
     line-height: 1.92;
   }
 
+  html[data-writing="vertical"] {
+    --vertical-edge-safe: 0.58em;
+  }
+
   html[data-writing="vertical"] .reader-shell {
-    padding: 0.22rem 0.22rem 0.4rem;
+    padding: 0.12rem 0.16rem 0.2rem;
   }
 
   html[data-writing="vertical"] .reader-meta {
-    margin-inline: 0.15rem;
+    display: none;
   }
 
   html[data-writing="vertical"] .reader-frame {
-    width: calc(100vw - 0.44rem);
-    height: calc(100dvh - var(--reader-chrome-height));
+    width: calc(100vw - 0.32rem);
+    height: calc(var(--viewport-height, 100dvh) - var(--reader-chrome-height));
     min-height: 22rem;
-    padding: 0.62rem 0.5rem;
-    border-radius: 0.58rem;
+    padding: 0.72rem 0.44rem;
+    border-radius: 0.5rem;
   }
 
   html[data-writing="vertical"] .novel-body p {
-    margin-left: 1.35em;
+    margin-left: 1.32em;
   }
 }
 
 
 @supports not (height: 100dvh) {
-  .reader-frame {
-    min-height: calc(100vh - var(--reader-chrome-height));
-  }
-
-  html[data-writing="vertical"] .reader-frame {
-    height: calc(100vh - var(--reader-chrome-height));
+  :root {
+    --viewport-height: 100vh;
   }
 }
 

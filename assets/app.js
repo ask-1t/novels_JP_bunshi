@@ -18,12 +18,14 @@ const els = {};
 document.addEventListener("DOMContentLoaded", async () => {
   cacheElements();
   bindControls();
+  setupViewportSizing();
   applySavedFontSize();
 
   await loadMetadata();
   await loadNovel();
 
   updateLabels();
+  updateViewportSizing();
   restoreScrollPosition();
   startProgressWatcher();
 });
@@ -67,6 +69,54 @@ function bindControls() {
 
   els.readerFrame.addEventListener("scroll", debounce(saveScrollPosition, 150), { passive: true });
   window.addEventListener("beforeunload", saveScrollPosition);
+}
+
+
+function setupViewportSizing() {
+  updateViewportSizing();
+
+  const onResize = debounce(updateViewportSizing, 80);
+  window.addEventListener("resize", onResize, { passive: true });
+  window.addEventListener("orientationchange", onResize, { passive: true });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", onResize, { passive: true });
+    window.visualViewport.addEventListener("scroll", onResize, { passive: true });
+  }
+}
+
+function updateViewportSizing() {
+  if (!document.documentElement) return;
+
+  const viewportHeight = Math.round(window.visualViewport?.height || window.innerHeight || 0);
+  if (viewportHeight > 0) {
+    document.documentElement.style.setProperty("--viewport-height", `${viewportHeight}px`);
+  }
+
+  requestAnimationFrame(() => {
+    const header = document.querySelector(".site-header");
+    const shell = document.querySelector(".reader-shell");
+    const meta = document.querySelector(".reader-meta");
+
+    const headerHeight = header ? header.getBoundingClientRect().height : 0;
+    const shellStyle = shell ? getComputedStyle(shell) : null;
+    const shellPadding = shellStyle
+      ? parseFloat(shellStyle.paddingTop) + parseFloat(shellStyle.paddingBottom)
+      : 0;
+
+    const metaStyle = meta ? getComputedStyle(meta) : null;
+    const metaVisible = meta && metaStyle && metaStyle.display !== "none";
+    const metaHeight = metaVisible ? meta.getBoundingClientRect().height : 0;
+    const metaBottom = metaVisible ? parseFloat(metaStyle.marginBottom) || 0 : 0;
+
+    // Mobile Safariでは表示領域が動的に変わりやすいため、実測値に少しだけ余裕を足します。
+    const safety = els.html?.dataset.writing === "vertical" ? 10 : 14;
+    const chromeHeight = Math.ceil(headerHeight + shellPadding + metaHeight + metaBottom + safety);
+
+    if (chromeHeight > 0) {
+      document.documentElement.style.setProperty("--reader-chrome-height", `${chromeHeight}px`);
+    }
+  });
 }
 
 async function loadMetadata() {
@@ -246,6 +296,7 @@ function setWritingMode(mode) {
   els.html.dataset.writing = mode;
   localStorage.setItem(STORAGE_KEYS.writing, mode);
   updateLabels();
+  updateViewportSizing();
 
   requestAnimationFrame(() => {
     els.readerFrame.scrollTop = 0;
@@ -287,6 +338,7 @@ function setFontSize(size, persist = true) {
   }
 
   if (persist) localStorage.setItem(STORAGE_KEYS.fontSize, String(next));
+  updateViewportSizing();
 }
 
 function updateLabels() {
@@ -335,7 +387,10 @@ function startProgressWatcher() {
 
   els.readerFrame.addEventListener("scroll", update, { passive: true });
   window.addEventListener("scroll", update, { passive: true });
-  window.addEventListener("resize", debounce(updateProgress, 150));
+  window.addEventListener("resize", debounce(() => {
+    updateViewportSizing();
+    updateProgress();
+  }, 150));
   updateProgress();
 }
 
