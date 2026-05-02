@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ja" data-writing="horizontal">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>静的小説サイト</title>
+  <meta name="description" content="GitHub Pagesで公開できる日本語小説サイト">
+  <script>
+    (() => {
+      const savedTheme = localStorage.getItem("novel-theme");
+      const savedWriting = localStorage.getItem("novel-writing");
+      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.dataset.theme = savedTheme || (prefersDark ? "dark" : "light");
+      document.documentElement.dataset.writing = savedWriting || "horizontal";
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#novelBody">本文へ移動</a>
+
+  <header class="site-header">
+    <div class="brand">
+      <p class="eyebrow">Novel on GitHub Pages</p>
+      <h1 id="siteTitle">静的小説サイト</h1>
+      <p id="siteAuthor" class="author"></p>
+    </div>
+
+    <nav class="toolbar" aria-label="表示設定">
+      <button type="button" id="writingToggle" class="control-button" aria-pressed="false">縦書き</button>
+      <button type="button" id="themeToggle" class="control-button" aria-pressed="false">ダーク</button>
+      <button type="button" id="tocButton" class="control-button">目次</button>
+      <div class="font-controls" aria-label="文字サイズ">
+        <button type="button" id="fontDown" class="control-button compact" aria-label="文字を小さく">A−</button>
+        <button type="button" id="fontReset" class="control-button compact" aria-label="文字サイズを標準に戻す">標準</button>
+        <button type="button" id="fontUp" class="control-button compact" aria-label="文字を大きく">A＋</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="reader-shell" aria-labelledby="siteTitle">
+      <div class="reader-meta">
+        <span id="readingModeLabel">横書き表示</span>
+        <span aria-hidden="true">・</span>
+        <span id="themeLabel">ライトモード</span>
+        <span aria-hidden="true">・</span>
+        <span id="progressLabel">0%</span>
+      </div>
+
+      <article id="readerFrame" class="reader-frame">
+        <div id="novelBody" class="novel-body" aria-live="polite">
+          <p class="loading">本文を読み込んでいます。</p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <dialog id="tocDialog" class="toc-dialog">
+    <form method="dialog" class="toc-card">
+      <div class="toc-header">
+        <h2>目次</h2>
+        <button type="submit" class="control-button compact">閉じる</button>
+      </div>
+      <ol id="tocList" class="toc-list"></ol>
+    </form>
+  </dialog>
+
+  <footer class="site-footer">
+    <p>このページはHTML/CSS/JavaScriptだけで動く静的小説サイトです。本文は <code>data/novel.txt</code> を編集してください。</p>
+  </footer>
+
+  <noscript>
+    <p class="noscript">このサイトは本文の読み込みと表示切替にJavaScriptを使用します。ブラウザのJavaScriptを有効にしてください。</p>
+  </noscript>
+
+  <script src="assets/app.js" defer></script>
+</body>
+</html>
