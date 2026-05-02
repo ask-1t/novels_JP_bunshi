@@ -19,21 +19,17 @@
   <a class="skip-link" href="#novelBody">本文へ移動</a>
 
   <header class="site-header">
-    <div class="brand">
-      <p class="eyebrow">Novel on GitHub Pages</p>
-      <h1 id="siteTitle">静的小説サイト</h1>
-      <p id="siteAuthor" class="author"></p>
-    </div>
+    <h1 id="siteTitle" class="visually-hidden">静的小説サイト</h1>
 
     <nav class="toolbar" aria-label="表示設定">
       <button type="button" id="writingToggle" class="control-button" aria-pressed="false">縦書き</button>
       <button type="button" id="themeToggle" class="control-button" aria-pressed="false">ダーク</button>
       <button type="button" id="tocButton" class="control-button">目次</button>
-      <div class="font-controls" aria-label="文字サイズ">
-        <button type="button" id="fontDown" class="control-button compact" aria-label="文字を小さく">A−</button>
-        <button type="button" id="fontReset" class="control-button compact" aria-label="文字サイズを標準に戻す">標準</button>
-        <button type="button" id="fontUp" class="control-button compact" aria-label="文字を大きく">A＋</button>
-      </div>
+      <label class="font-slider" for="fontSizeRange">
+        <span>文字</span>
+        <input type="range" id="fontSizeRange" min="0.86" max="1.55" step="0.01" value="1.12" aria-label="文字サイズ">
+        <output id="fontSizeLabel" for="fontSizeRange">標準</output>
+      </label>
     </nav>
   </header>
 
