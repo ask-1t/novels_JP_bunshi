@@ -297,7 +297,10 @@ function parseInline(input) {
 }
 
 function parsePlain(text) {
-  return escapeHtml(text).replace(/([0-9A-Za-z]{1,4})/g, '<span class="tcy">$1</span>');
+  return escapeHtml(text).replace(/([0-9A-Za-z]{1,4})/g, (token) => {
+    const len = Math.min(token.length, 4);
+    return `<span class="tcy tcy-${len}" aria-label="${token}"><span class="tcy-inner">${token}</span></span>`;
+  });
 }
 
 function escapeHtml(text) {
