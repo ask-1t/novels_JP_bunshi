@@ -9,8 +9,7 @@
     (() => {
       const savedTheme = localStorage.getItem("novel-theme");
       const savedWriting = localStorage.getItem("novel-writing");
-      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-      document.documentElement.dataset.theme = savedTheme || (prefersDark ? "dark" : "light");
+      document.documentElement.dataset.theme = savedTheme || "light";
       document.documentElement.dataset.writing = savedWriting || "horizontal";
     })();
   </script>
