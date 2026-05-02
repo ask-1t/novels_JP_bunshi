@@ -297,10 +297,12 @@ function parseInline(input) {
 }
 
 function parsePlain(text) {
-  // 独自記法: 〔!!〕 / 〔!?〕 / 〔！？〕 のように囲むと、
-  // 縦書き時に1文字分の小さな横組みとして表示します。
-  // また、本文中の ！！ / ！？ / ？？ / !! / !? / ?? も自動で同じ扱いにします。
-  const tokenPattern = /〔([^〕\n]{1,8})〕|([！？!?]{2})|([0-9A-Za-z]{1,4})/g;
+  // 明示的な縦中横記法:
+  //   [tcy]12[/tcy]
+  //   [tcy]!?[/tcy]
+  //   [tcy]AI[/tcy]
+  // 作者側で「ここだけ縦中横」と指定したい箇所に使います。
+  const tokenPattern = /\[tcy\]([^\[\]\n]{1,8})\[\/tcy\]|([！？!?]{2})|([0-9A-Za-z]{1,4})/g;
   let result = "";
   let cursor = 0;
 
