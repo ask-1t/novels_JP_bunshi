@@ -1,0 +1,421 @@
+/* ===============================
+   静的小説サイト 基本スタイル
+   =============================== */
+
+:root {
+  color-scheme: light dark;
+  --bg: #f7f3ec;
+  --paper: #fffdf8;
+  --ink: #231f20;
+  --muted: #6f665d;
+  --line: rgba(35, 31, 32, 0.16);
+  --button: #f2eadf;
+  --button-hover: #e7dbc9;
+  --accent: #7b3f2f;
+  --shadow: 0 18px 45px rgba(58, 45, 32, 0.12);
+
+  --font-body: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", "Source Han Serif JP", "Times New Roman", serif;
+  --font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", sans-serif;
+
+  --font-size: 1.12rem;
+  --line-height-horizontal: 2.05;
+  --line-height-vertical: 1.9;
+  --content-width: 46rem;
+}
+
+html[data-theme="dark"] {
+  --bg: #111111;
+  --paper: #1a1a1d;
+  --ink: #efeee9;
+  --muted: #b9b1a6;
+  --line: rgba(255, 255, 255, 0.16);
+  --button: #27272c;
+  --button-hover: #34343b;
+  --accent: #e0a48b;
+  --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(123, 63, 47, 0.09), transparent 28rem),
+    var(--bg);
+  color: var(--ink);
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 20;
+  transform: translateY(-180%);
+  padding: 0.65rem 0.85rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem clamp(1rem, 3vw, 2.25rem);
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.brand {
+  min-width: 0;
+}
+
+.eyebrow,
+.author,
+.reader-meta,
+.site-footer {
+  color: var(--muted);
+}
+
+.eyebrow {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.site-header h1 {
+  margin: 0;
+  overflow: hidden;
+  font-size: clamp(1.2rem, 2.6vw, 1.75rem);
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.author {
+  margin: 0.25rem 0 0;
+  font-size: 0.92rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.font-controls {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.control-button {
+  appearance: none;
+  min-height: 2.35rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--button);
+  color: var(--ink);
+  font: 700 0.9rem/1 var(--font-ui);
+  cursor: pointer;
+}
+
+.control-button:hover,
+.control-button:focus-visible {
+  background: var(--button-hover);
+  outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.control-button[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--line));
+  background: color-mix(in srgb, var(--accent) 18%, var(--button));
+  color: var(--ink);
+}
+
+.control-button.compact {
+  padding-inline: 0.62rem;
+}
+
+.reader-shell {
+  padding: 1rem clamp(0.75rem, 2.5vw, 2rem) 2rem;
+}
+
+.reader-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  max-width: var(--content-width);
+  margin: 0 auto 0.7rem;
+  font-size: 0.85rem;
+}
+
+.reader-frame {
+  max-width: var(--content-width);
+  min-height: 65vh;
+  margin: 0 auto;
+  padding: clamp(1.4rem, 4vw, 3.2rem);
+  border: 1px solid var(--line);
+  border-radius: 1.35rem;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.novel-body {
+  font-family: var(--font-body);
+  font-size: var(--font-size);
+  font-feature-settings: "palt";
+  letter-spacing: 0.02em;
+}
+
+.novel-body h2,
+.novel-body h3 {
+  margin: 3em 0 1.4em;
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.novel-body h2 {
+  font-size: 1.35em;
+}
+
+.novel-body h3 {
+  font-size: 1.13em;
+}
+
+.novel-body p {
+  margin: 0 0 1.6em;
+  line-height: var(--line-height-horizontal);
+  text-align: justify;
+  overflow-wrap: anywhere;
+}
+
+.novel-body hr {
+  width: 7em;
+  margin: 3em auto;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+.novel-body ruby {
+  ruby-position: over;
+}
+
+.novel-body rt {
+  font-size: 0.46em;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.novel-body .tcy {
+  text-combine-upright: all;
+  -webkit-text-combine: horizontal;
+}
+
+.loading,
+.error {
+  color: var(--muted);
+  font-family: var(--font-ui);
+}
+
+.error {
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* 縦書きモード */
+html[data-writing="vertical"] body {
+  overflow: hidden;
+}
+
+html[data-writing="vertical"] .reader-shell {
+  padding: 0.75rem clamp(0.5rem, 2vw, 1.25rem) 1rem;
+}
+
+html[data-writing="vertical"] .reader-meta {
+  max-width: none;
+  margin-inline: clamp(0.5rem, 2vw, 1rem);
+}
+
+html[data-writing="vertical"] .reader-frame {
+  width: calc(100vw - clamp(1rem, 4vw, 2.5rem));
+  max-width: none;
+  height: calc(100dvh - 8.25rem);
+  min-height: 24rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  padding: clamp(1.1rem, 3vw, 2.2rem);
+  scroll-snap-type: x proximity;
+}
+
+html[data-writing="vertical"] .novel-body {
+  width: max-content;
+  height: 100%;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  line-height: var(--line-height-vertical);
+  letter-spacing: 0.08em;
+}
+
+html[data-writing="vertical"] .novel-body p {
+  max-height: 100%;
+  margin: 0 0 0 1.8em;
+  line-height: var(--line-height-vertical);
+  text-align: start;
+}
+
+html[data-writing="vertical"] .novel-body h2,
+html[data-writing="vertical"] .novel-body h3 {
+  margin: 0 0 0 2.2em;
+  line-height: 1.7;
+}
+
+html[data-writing="vertical"] .novel-body hr {
+  width: auto;
+  height: 7em;
+  margin: auto 2.2em;
+  border-top: 0;
+  border-left: 1px solid var(--line);
+}
+
+html[data-writing="vertical"] .site-footer {
+  display: none;
+}
+
+/* 目次 */
+.toc-dialog {
+  width: min(42rem, calc(100vw - 2rem));
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 1.1rem;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.toc-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.toc-card {
+  padding: 1.25rem;
+}
+
+.toc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.7rem;
+}
+
+.toc-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.toc-list {
+  display: grid;
+  gap: 0.45rem;
+  max-height: min(62vh, 36rem);
+  margin: 0;
+  padding-left: 1.45rem;
+  overflow: auto;
+}
+
+.toc-list a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.toc-list a:hover {
+  text-decoration: underline;
+}
+
+.toc-list .toc-level-3 {
+  margin-left: 1.2rem;
+  font-size: 0.95em;
+}
+
+.site-footer {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+  font-size: 0.88rem;
+}
+
+.noscript {
+  margin: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: var(--paper);
+}
+
+@media (max-width: 720px) {
+  .site-header {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar {
+    justify-content: flex-start;
+  }
+
+  html[data-writing="vertical"] .reader-frame {
+    height: calc(100dvh - 12.5rem);
+  }
+}
+
+@media print {
+  .site-header,
+  .reader-meta,
+  .site-footer,
+  .toc-dialog,
+  .skip-link {
+    display: none !important;
+  }
+
+  body,
+  html {
+    background: #fff;
+    color: #000;
+  }
+
+  .reader-shell,
+  .reader-frame {
+    padding: 0;
+  }
+
+  .reader-frame {
+    max-width: none;
+    border: 0;
+    box-shadow: none;
+  }
+}
