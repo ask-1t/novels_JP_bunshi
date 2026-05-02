@@ -337,6 +337,13 @@ html[data-writing="vertical"] .novel-body .tcy-2 .tcy-inner {
   letter-spacing: -0.03em;
 }
 
+html[data-writing="vertical"] .novel-body .tcy-punct .tcy-inner,
+html[data-writing="vertical"] .novel-body .tcy-forced .tcy-inner {
+  font-size: 0.78em;
+  letter-spacing: -0.08em;
+  font-family: var(--font-ui);
+}
+
 html[data-writing="vertical"] .novel-body .tcy-3 .tcy-inner {
   font-size: 0.62em;
   letter-spacing: -0.08em;

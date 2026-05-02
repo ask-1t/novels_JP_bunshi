@@ -297,10 +297,50 @@ function parseInline(input) {
 }
 
 function parsePlain(text) {
-  return escapeHtml(text).replace(/([0-9A-Za-z]{1,4})/g, (token) => {
-    const len = Math.min(token.length, 4);
-    return `<span class="tcy tcy-${len}" aria-label="${token}"><span class="tcy-inner">${token}</span></span>`;
-  });
+  // 独自記法: 〔!!〕 / 〔!?〕 / 〔！？〕 のように囲むと、
+  // 縦書き時に1文字分の小さな横組みとして表示します。
+  // また、本文中の ！！ / ！？ / ？？ / !! / !? / ?? も自動で同じ扱いにします。
+  const tokenPattern = /〔([^〕\n]{1,8})〕|([！？!?]{2})|([0-9A-Za-z]{1,4})/g;
+  let result = "";
+  let cursor = 0;
+
+  for (const match of text.matchAll(tokenPattern)) {
+    const index = match.index ?? 0;
+    if (index > cursor) {
+      result += escapeHtml(text.slice(cursor, index));
+    }
+
+    if (match[1]) {
+      result += renderTcy(match[1], "tcy-forced");
+    } else if (match[2]) {
+      result += renderTcy(match[2], "tcy-punct");
+    } else {
+      result += renderTcy(match[3], "tcy-alnum");
+    }
+
+    cursor = index + match[0].length;
+  }
+
+  if (cursor < text.length) {
+    result += escapeHtml(text.slice(cursor));
+  }
+
+  return result;
+}
+
+function renderTcy(rawToken, extraClass = "") {
+  const token = normalizeTcyToken(rawToken);
+  const len = Math.min(Array.from(token).length || 1, 4);
+  const escapedToken = escapeHtml(token);
+  const classNames = ["tcy", `tcy-${len}`, extraClass].filter(Boolean).join(" ");
+  return `<span class="${classNames}" aria-label="${escapedToken}"><span class="tcy-inner">${escapedToken}</span></span>`;
+}
+
+function normalizeTcyToken(token) {
+  return String(token)
+    .replaceAll("！", "!")
+    .replaceAll("？", "?")
+    .replace(/[０-９Ａ-Ｚａ-ｚ]/g, (char) => String.fromCharCode(char.charCodeAt(0) - 0xFEE0));
 }
 
 function escapeHtml(text) {
