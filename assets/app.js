@@ -297,12 +297,13 @@ function parseInline(input) {
 }
 
 function parsePlain(text) {
-  // 明示的な縦中横記法:
+  // 明示的な縦中横記法だけを変換します。
+  // 使える書き方:
   //   [tcy]12[/tcy]
-  //   [tcy]!?[/tcy]
-  //   [tcy]AI[/tcy]
-  // 作者側で「ここだけ縦中横」と指定したい箇所に使います。
-  const tokenPattern = /\[tcy\]([^\[\]\n]{1,8})\[\/tcy\]|([！？!?]{2})|([0-9A-Za-z]{1,4})/g;
+  //   <span class="tcy">12</span>
+  // どちらも最終的には <span class="tcy">12</span> に揃えます。
+  // 自動で数字や英字を全部拾う処理は、Safariで向きが崩れる原因になりやすいため外しました。
+  const tokenPattern = /\[tcy\]([^\[\]\n]{1,8})\[\/tcy\]|<span\s+class=["']tcy["']>([^<>\n]{1,8})<\/span>/gi;
   let result = "";
   let cursor = 0;
 
@@ -312,14 +313,8 @@ function parsePlain(text) {
       result += escapeHtml(text.slice(cursor, index));
     }
 
-    if (match[1]) {
-      result += renderTcy(match[1], "tcy-forced");
-    } else if (match[2]) {
-      result += renderTcy(match[2], "tcy-punct");
-    } else {
-      result += renderTcy(match[3], "tcy-alnum");
-    }
-
+    const token = match[1] || match[2] || "";
+    result += renderTcy(token);
     cursor = index + match[0].length;
   }
 
@@ -330,12 +325,11 @@ function parsePlain(text) {
   return result;
 }
 
-function renderTcy(rawToken, extraClass = "") {
+function renderTcy(rawToken) {
   const token = normalizeTcyToken(rawToken);
-  const len = Math.min(Array.from(token).length || 1, 4);
+  const len = Math.min(Array.from(token).length || 1, 8);
   const escapedToken = escapeHtml(token);
-  const classNames = ["tcy", `tcy-${len}`, extraClass].filter(Boolean).join(" ");
-  return `<span class="${classNames}" aria-label="${escapedToken}"><span class="tcy-inner">${escapedToken}</span></span>`;
+  return `<span class="tcy tcy-${len}">${escapedToken}</span>`;
 }
 
 function normalizeTcyToken(token) {
