@@ -13,8 +13,6 @@ const STORAGE_KEYS = {
 const DEFAULT_FONT_SIZE = 1.12;
 const MIN_FONT_SIZE = 0.86;
 const MAX_FONT_SIZE = 1.55;
-const FONT_STEP = 0.06;
-
 const els = {};
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -33,7 +31,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 function cacheElements() {
   els.html = document.documentElement;
   els.siteTitle = document.getElementById("siteTitle");
-  els.siteAuthor = document.getElementById("siteAuthor");
   els.readerFrame = document.getElementById("readerFrame");
   els.novelBody = document.getElementById("novelBody");
   els.writingToggle = document.getElementById("writingToggle");
@@ -41,9 +38,8 @@ function cacheElements() {
   els.tocButton = document.getElementById("tocButton");
   els.tocDialog = document.getElementById("tocDialog");
   els.tocList = document.getElementById("tocList");
-  els.fontDown = document.getElementById("fontDown");
-  els.fontReset = document.getElementById("fontReset");
-  els.fontUp = document.getElementById("fontUp");
+  els.fontSizeRange = document.getElementById("fontSizeRange");
+  els.fontSizeLabel = document.getElementById("fontSizeLabel");
   els.readingModeLabel = document.getElementById("readingModeLabel");
   els.themeLabel = document.getElementById("themeLabel");
   els.progressLabel = document.getElementById("progressLabel");
@@ -66,9 +62,8 @@ function bindControls() {
     }
   });
 
-  els.fontDown.addEventListener("click", () => changeFontSize(-FONT_STEP));
-  els.fontUp.addEventListener("click", () => changeFontSize(FONT_STEP));
-  els.fontReset.addEventListener("click", () => setFontSize(DEFAULT_FONT_SIZE));
+  els.fontSizeRange.addEventListener("input", () => setFontSize(Number(els.fontSizeRange.value)));
+  els.fontSizeRange.addEventListener("change", () => setFontSize(Number(els.fontSizeRange.value)));
 
   els.readerFrame.addEventListener("scroll", debounce(saveScrollPosition, 150), { passive: true });
   window.addEventListener("beforeunload", saveScrollPosition);
@@ -83,12 +78,6 @@ async function loadMetadata() {
     if (metadata.title) {
       document.title = metadata.title;
       els.siteTitle.textContent = metadata.title;
-    }
-
-    if (metadata.author) {
-      els.siteAuthor.textContent = `著者：${metadata.author}`;
-    } else {
-      els.siteAuthor.textContent = "";
     }
 
     const description = document.querySelector('meta[name="description"]');
@@ -281,14 +270,22 @@ function applySavedFontSize() {
   setFontSize(Number.isFinite(saved) ? saved : DEFAULT_FONT_SIZE, false);
 }
 
-function changeFontSize(delta) {
-  const current = Number(getComputedStyle(document.documentElement).getPropertyValue("--font-size").replace("rem", "")) || DEFAULT_FONT_SIZE;
-  setFontSize(current + delta);
-}
-
 function setFontSize(size, persist = true) {
-  const next = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, Number(size.toFixed(2))));
+  const numeric = Number(size);
+  const safeSize = Number.isFinite(numeric) ? numeric : DEFAULT_FONT_SIZE;
+  const next = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, Number(safeSize.toFixed(2))));
+
   document.documentElement.style.setProperty("--font-size", `${next}rem`);
+
+  if (els.fontSizeRange) {
+    els.fontSizeRange.value = String(next);
+  }
+
+  if (els.fontSizeLabel) {
+    const percent = Math.round((next / DEFAULT_FONT_SIZE) * 100);
+    els.fontSizeLabel.textContent = percent === 100 ? "標準" : `${percent}%`;
+  }
+
   if (persist) localStorage.setItem(STORAGE_KEYS.fontSize, String(next));
 }
 
