@@ -1,74 +1,61 @@
 <!doctype html>
-<html lang="ja" data-writing="horizontal">
+<html lang="ja" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>静的小説サイト</title>
-  <meta name="description" content="GitHub Pagesで公開できる日本語小説サイト">
+  <meta name="description" content="GitHub Pagesで公開する日本語小説の入口ページ">
   <script>
     (() => {
       const savedTheme = localStorage.getItem("novel-theme");
-      const savedWriting = localStorage.getItem("novel-writing");
       document.documentElement.dataset.theme = savedTheme || "light";
-      document.documentElement.dataset.writing = savedWriting || "horizontal";
     })();
   </script>
-  <link rel="stylesheet" href="assets/styles.css?v=8">
+  <link rel="stylesheet" href="assets/styles.css?v=9">
 </head>
-<body>
-  <a class="skip-link" href="#novelBody">本文へ移動</a>
+<body class="cover-page">
+  <a class="skip-link" href="#coverActions">読書メニューへ移動</a>
 
-  <header class="site-header">
-    <h1 id="siteTitle" class="visually-hidden">静的小説サイト</h1>
+  <main class="cover-shell" aria-labelledby="coverTitle">
+    <section class="cover-card">
+      <p class="cover-kicker">NOVEL</p>
+      <h1 id="coverTitle" class="cover-title">小説タイトル</h1>
+      <p id="coverAuthor" class="cover-author">著者名</p>
 
-    <nav class="toolbar" aria-label="表示設定">
-      <button type="button" id="writingToggle" class="control-button" aria-pressed="false">縦書き</button>
-      <button type="button" id="themeToggle" class="control-button" aria-pressed="false">ダーク</button>
-      <button type="button" id="tocButton" class="control-button">目次</button>
-      <label class="font-slider" for="fontSizeRange">
-        <span>文字</span>
-        <input type="range" id="fontSizeRange" min="0.86" max="1.55" step="0.01" value="1.12" aria-label="文字サイズ">
-        <output id="fontSizeLabel" for="fontSizeRange">標準</output>
-      </label>
-    </nav>
-  </header>
+      <p id="coverDescription" class="cover-description">
+        GitHub Pagesで公開する日本語小説サイトです。縦書き・横書き・ルビ・縦中横・ダークモードに対応しています。
+      </p>
 
-  <main>
-    <section class="reader-shell" aria-labelledby="siteTitle">
-      <div class="reader-meta">
-        <span id="readingModeLabel">横書き表示</span>
-        <span aria-hidden="true">・</span>
-        <span id="themeLabel">ライトモード</span>
-        <span aria-hidden="true">・</span>
-        <span id="progressLabel">0%</span>
+      <nav id="coverActions" class="cover-actions" aria-label="読書メニュー">
+        <a class="primary-link" href="reader.html?start=1">はじめから読む</a>
+        <a class="secondary-link" href="reader.html">前回の続きから読む</a>
+        <a class="secondary-link" href="#chapterList">目次を見る</a>
+      </nav>
+
+      <section class="cover-note" aria-label="表示機能">
+        <p>本文ページでは、縦書き・横書き、ライト・ダーク、文字サイズを切り替えられます。</p>
+      </section>
+    </section>
+
+    <section class="chapter-panel" aria-labelledby="chapterHeading">
+      <div class="chapter-panel-header">
+        <h2 id="chapterHeading">目次</h2>
+        <p id="chapterCount">読み込み中</p>
       </div>
-
-      <article id="readerFrame" class="reader-frame">
-        <div id="novelBody" class="novel-body" aria-live="polite">
-          <p class="loading">本文を読み込んでいます。</p>
-        </div>
-      </article>
+      <ol id="chapterList" class="cover-chapter-list">
+        <li>目次を読み込んでいます。</li>
+      </ol>
     </section>
   </main>
 
-  <dialog id="tocDialog" class="toc-dialog">
-    <form method="dialog" class="toc-card">
-      <div class="toc-header">
-        <h2>目次</h2>
-        <button type="submit" class="control-button compact">閉じる</button>
-      </div>
-      <ol id="tocList" class="toc-list"></ol>
-    </form>
-  </dialog>
-
-  <footer class="site-footer">
-    <p>このページはHTML/CSS/JavaScriptだけで動く静的小説サイトです。本文は <code>data/chapters/01.txt</code> 〜 <code>09.txt</code> を編集してください。</p>
+  <footer class="cover-footer">
+    <button type="button" id="coverThemeToggle" class="control-button">ダーク</button>
   </footer>
 
   <noscript>
-    <p class="noscript">このサイトは本文の読み込みと表示切替にJavaScriptを使用します。ブラウザのJavaScriptを有効にしてください。</p>
+    <p class="noscript">このサイトは作品情報と目次の読み込みにJavaScriptを使用します。ブラウザのJavaScriptを有効にしてください。</p>
   </noscript>
 
-  <script src="assets/app.js?v=8" defer></script>
+  <script src="assets/cover.js?v=9" defer></script>
 </body>
 </html>
