@@ -21,12 +21,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupViewportSizing();
   applySavedFontSize();
 
+  const readIntent = getInitialReadIntent();
+
   await loadMetadata();
   await loadNovel();
 
   updateLabels();
   updateViewportSizing();
-  restoreScrollPosition();
+  applyInitialReadIntent(readIntent);
   startProgressWatcher();
 });
 
@@ -45,6 +47,68 @@ function cacheElements() {
   els.readingModeLabel = document.getElementById("readingModeLabel");
   els.themeLabel = document.getElementById("themeLabel");
   els.progressLabel = document.getElementById("progressLabel");
+}
+
+function getInitialReadIntent() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    startFresh: params.get("start") === "1",
+    targetId: decodeURIComponent(window.location.hash.replace(/^#/, "")),
+  };
+}
+
+function applyInitialReadIntent(readIntent) {
+  if (readIntent.startFresh) {
+    localStorage.removeItem(STORAGE_KEYS.scrollHorizontal);
+    localStorage.removeItem(STORAGE_KEYS.scrollVertical);
+  }
+
+  requestAnimationFrame(() => {
+    if (readIntent.targetId) {
+      scrollToSection(readIntent.targetId, false);
+      return;
+    }
+
+    if (readIntent.startFresh) {
+      goToStart();
+      return;
+    }
+
+    restoreScrollPosition();
+  });
+}
+
+function goToStart() {
+  if (els.html.dataset.writing === "vertical") {
+    els.readerFrame.scrollTop = 0;
+    els.readerFrame.scrollLeft = els.readerFrame.scrollWidth;
+  } else {
+    window.scrollTo({ top: 0, left: 0 });
+    els.readerFrame.scrollTop = 0;
+    els.readerFrame.scrollLeft = 0;
+  }
+  saveScrollPosition();
+  updateProgress();
+}
+
+function scrollToSection(targetId, smooth = true) {
+  const target = document.getElementById(targetId);
+  if (!target) {
+    if (smooth) return;
+    goToStart();
+    return;
+  }
+
+  if (els.html.dataset.writing === "vertical") {
+    target.scrollIntoView({ inline: "center", block: "nearest", behavior: smooth ? "smooth" : "auto" });
+  } else {
+    target.scrollIntoView({ block: "start", behavior: smooth ? "smooth" : "auto" });
+  }
+
+  window.setTimeout(() => {
+    saveScrollPosition();
+    updateProgress();
+  }, smooth ? 220 : 40);
 }
 
 function bindControls() {
@@ -364,15 +428,7 @@ function renderToc(toc) {
   els.tocList.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", (event) => {
       event.preventDefault();
-      const target = document.getElementById(link.dataset.target);
-      if (!target) return;
-
-      if (els.html.dataset.writing === "vertical") {
-        target.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
-      } else {
-        target.scrollIntoView({ block: "start", behavior: "smooth" });
-      }
-
+      scrollToSection(link.dataset.target, true);
       els.tocDialog.close();
     });
   });
