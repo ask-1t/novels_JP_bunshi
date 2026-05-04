@@ -377,6 +377,10 @@ body.vertical-mode .novel-body .chapter-break {
   background: var(--bg);
 }
 
+body.vertical-mode .reader-nav {
+  flex-direction: row-reverse;
+}
+
 .nav-link.disabled {
   opacity: 0.35;
   pointer-events: none;
