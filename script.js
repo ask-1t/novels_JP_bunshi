@@ -6,6 +6,10 @@ const DEFAULT_SETTINGS = {
   fontSize: 19
 };
 
+if ("scrollRestoration" in history) {
+  history.scrollRestoration = "manual";
+}
+
 function loadSettings() {
   try {
     return { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}") };
@@ -126,6 +130,40 @@ async function initHome() {
   }
 }
 
+
+function scrollToReadingStart() {
+  const articleScroll = document.getElementById("article-scroll");
+  const novel = document.getElementById("novel");
+  if (!articleScroll) return;
+
+  const jump = () => {
+    const oldBehavior = articleScroll.style.scrollBehavior;
+    articleScroll.style.scrollBehavior = "auto";
+
+    articleScroll.scrollTop = 0;
+
+    if (document.body.classList.contains("vertical-mode")) {
+      const first = novel?.firstElementChild;
+      if (first && typeof first.scrollIntoView === "function") {
+        first.scrollIntoView({ block: "start", inline: "nearest", behavior: "auto" });
+      }
+
+      // vertical-rl の読み始めは右端。環境によって scrollLeft=0 が左端（末尾）扱いに
+      // なるため、明示的に右端へ寄せる。scrollWidth を入れても最大値に丸められる。
+      articleScroll.scrollLeft = articleScroll.scrollWidth;
+      articleScroll.scrollTop = 0;
+    } else {
+      articleScroll.scrollLeft = 0;
+    }
+
+    articleScroll.style.scrollBehavior = oldBehavior;
+  };
+
+  jump();
+  requestAnimationFrame(jump);
+  requestAnimationFrame(() => requestAnimationFrame(jump));
+}
+
 async function initReader() {
   const novel = document.getElementById("novel");
   if (!novel) return;
@@ -159,8 +197,7 @@ async function initReader() {
     if (!textResponse.ok) throw new Error(`${chapter.file} を読み込めませんでした。`);
     const rawText = await textResponse.text();
     novel.innerHTML = renderNovelText(rawText);
-    articleScroll.scrollTop = 0;
-    articleScroll.scrollLeft = 0;
+    scrollToReadingStart();
 
     const prev = chapters[currentIndex - 1];
     const next = chapters[currentIndex + 1];
@@ -211,11 +248,7 @@ function initControls() {
       settings.mode = settings.mode === "vertical" ? "horizontal" : "vertical";
       saveSettings(settings);
       applySettings(settings);
-      const scroll = document.getElementById("article-scroll");
-      if (scroll) {
-        scroll.scrollTop = 0;
-        scroll.scrollLeft = 0;
-      }
+      scrollToReadingStart();
     });
   }
 
