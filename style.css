@@ -1,0 +1,447 @@
+:root {
+  --bg: #ffffff;
+  --text: #111111;
+  --muted: #666666;
+  --panel: #f5f3ee;
+  --panel-strong: #ebe7df;
+  --border: #ded8cc;
+  --accent: #3f5f4a;
+  --accent-text: #ffffff;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+  --font-size: 19px;
+  --line-height-horizontal: 2.05;
+  --line-height-vertical: 2.08;
+  --content-width: 760px;
+  --toolbar-height: 120px;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+body.dark-theme {
+  --bg: #121212;
+  --text: #eeeeee;
+  --muted: #b9b9b9;
+  --panel: #1d1d1d;
+  --panel-strong: #282828;
+  --border: #3a3a3a;
+  --accent: #b9c8a7;
+  --accent-text: #101010;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+
+a {
+  color: inherit;
+}
+
+button,
+select,
+input {
+  font: inherit;
+}
+
+.cover {
+  width: min(100%, 1040px);
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: clamp(28px, 7vw, 88px) clamp(18px, 5vw, 48px);
+}
+
+.cover-card {
+  padding: clamp(28px, 7vw, 72px);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(63, 95, 74, 0.12), transparent 38%),
+    var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.cover-kicker {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.cover h1 {
+  margin: 0;
+  font-size: clamp(2rem, 8vw, 4.8rem);
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+}
+
+.cover-copy {
+  max-width: 42rem;
+  margin: 28px 0 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  line-height: 1.9;
+}
+
+.cover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.primary-link,
+.secondary-link,
+.nav-link,
+.control-button,
+.plain-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary-link {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.secondary-link,
+.nav-link,
+.control-button,
+.plain-button {
+  background: var(--panel);
+  color: var(--text);
+}
+
+.toc-section {
+  margin-top: clamp(32px, 8vw, 80px);
+}
+
+.toc-section h2 {
+  margin: 0 0 20px;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.toc-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+  padding: 0;
+  list-style: none;
+  counter-reset: chapter;
+}
+
+.toc-list li {
+  counter-increment: chapter;
+}
+
+.toc-list a {
+  display: block;
+  min-height: 56px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--panel);
+  text-decoration: none;
+  line-height: 1.55;
+}
+
+.toc-list a:hover,
+.primary-link:hover,
+.secondary-link:hover,
+.nav-link:hover,
+.control-button:hover,
+.plain-button:hover {
+  filter: brightness(0.97);
+}
+
+.site-footer {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 10;
+}
+
+.reader-shell {
+  height: 100svh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.reader-toolbar {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 2;
+  padding: calc(8px + env(safe-area-inset-top)) clamp(10px, 3vw, 18px) 8px;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toolbar-main {
+  min-height: 36px;
+}
+
+.toolbar-controls {
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.back-home {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.chapter-meta {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.chapter-number {
+  color: var(--muted);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.85rem;
+}
+
+.chapter-title {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1rem;
+}
+
+.control-button,
+.chapter-select {
+  min-height: 38px;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text);
+}
+
+.chapter-select {
+  max-width: min(360px, 100%);
+  border-radius: 12px;
+}
+
+.font-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.9rem;
+}
+
+.font-control input {
+  width: 96px;
+  accent-color: var(--accent);
+}
+
+.reader-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  background: var(--bg);
+}
+
+.article-scroll {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: clamp(18px, 4vw, 44px) clamp(16px, 6vw, 56px);
+  scroll-behavior: smooth;
+}
+
+.novel-body {
+  margin: 0 auto;
+  max-width: var(--content-width);
+  color: var(--text);
+  font-size: var(--font-size);
+  line-height: var(--line-height-horizontal);
+  letter-spacing: 0.015em;
+}
+
+.novel-body h1,
+.novel-body h2 {
+  margin: 0 0 2rem;
+  font-size: 1.35em;
+  line-height: 1.7;
+  font-weight: 700;
+}
+
+.novel-body p {
+  margin: 0 0 1.05em;
+}
+
+.novel-body .chapter-break {
+  margin: 2.5em 0;
+  text-align: center;
+  color: var(--muted);
+  letter-spacing: 0.4em;
+}
+
+.novel-body ruby rt {
+  font-size: 0.5em;
+  line-height: 1;
+}
+
+.tcy {
+  text-combine-upright: all;
+  -webkit-text-combine: horizontal;
+  font-feature-settings: "tnum" 1;
+}
+
+body.vertical-mode .article-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-top: calc(18px + env(safe-area-inset-top));
+  padding-bottom: calc(22px + env(safe-area-inset-bottom));
+  padding-left: clamp(16px, 5vw, 56px);
+  padding-right: clamp(16px, 5vw, 56px);
+}
+
+body.vertical-mode .novel-body {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  max-width: none;
+  width: max-content;
+  height: calc(100% - 0.5rem);
+  min-height: 20rem;
+  margin: 0 auto;
+  padding-top: 0.35em;
+  padding-bottom: 0.35em;
+  line-height: var(--line-height-vertical);
+  letter-spacing: 0.03em;
+}
+
+body.vertical-mode .novel-body h1,
+body.vertical-mode .novel-body h2 {
+  margin: 0 0 0 2.1em;
+}
+
+body.vertical-mode .novel-body p {
+  margin: 0 0 0 1.05em;
+}
+
+body.vertical-mode .novel-body .chapter-break {
+  margin: 0 2.4em;
+  letter-spacing: 0.35em;
+}
+
+.reader-nav {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px clamp(10px, 3vw, 18px) calc(8px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.nav-link.disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.error-box {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--panel);
+  padding: 18px;
+  line-height: 1.8;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --font-size: 18px;
+  }
+
+  .reader-toolbar {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .toolbar-main {
+    align-items: center;
+  }
+
+  .toolbar-controls {
+    gap: 7px;
+  }
+
+  .control-button,
+  .chapter-select,
+  .font-control {
+    min-height: 36px;
+    font-size: 0.86rem;
+  }
+
+  .chapter-select {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .font-control input {
+    width: min(34vw, 132px);
+  }
+
+  .article-scroll {
+    padding-left: clamp(12px, 4vw, 24px);
+    padding-right: clamp(12px, 4vw, 24px);
+  }
+
+  body.vertical-mode .article-scroll {
+    padding-top: calc(16px + env(safe-area-inset-top));
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .reader-nav .nav-link {
+    flex: 1;
+  }
+}
+
+@supports not (height: 100svh) {
+  .reader-shell {
+    height: 100vh;
+    min-height: 100vh;
+  }
+}

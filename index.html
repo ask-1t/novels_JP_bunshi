@@ -1,61 +1,35 @@
 <!doctype html>
-<html lang="ja" data-theme="light">
+<html lang="ja">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>静的小説サイト</title>
-  <meta name="description" content="GitHub Pagesで公開する日本語小説の入口ページ">
-  <script>
-    (() => {
-      const savedTheme = localStorage.getItem("novel-theme");
-      document.documentElement.dataset.theme = savedTheme || "light";
-    })();
-  </script>
-  <link rel="stylesheet" href="assets/styles.css?v=9">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>仮定義：ジャガー未満</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="cover-page">
-  <a class="skip-link" href="#coverActions">読書メニューへ移動</a>
-
-  <main class="cover-shell" aria-labelledby="coverTitle">
+<body class="home light-theme">
+  <main class="cover" aria-labelledby="site-title">
     <section class="cover-card">
-      <p class="cover-kicker">NOVEL</p>
-      <h1 id="coverTitle" class="cover-title">分子間力くらいの距離</h1>
-      <p id="coverAuthor" class="cover-author">Kazuhisa</p>
-
-      <p id="coverDescription" class="cover-description">
-        縦書き・横書き・ルビ・縦中横・ダークモードに対応しています。
+      <p class="cover-kicker">Novel on GitHub Pages</p>
+      <h1 id="site-title">仮定義：ジャガー未満</h1>
+      <p class="cover-copy">
+        猫を拾ったところから始まる、猫と人間と街の話。
       </p>
-
-      <nav id="coverActions" class="cover-actions" aria-label="読書メニュー">
-        <a class="primary-link" href="reader.html?start=1">はじめから読む</a>
-        <a class="secondary-link" href="reader.html">前回の続きから読む</a>
-        <a class="secondary-link" href="#chapterList">目次を見る</a>
-      </nav>
-
-      <section class="cover-note" aria-label="表示機能">
-        <p>本文ページでは、縦書き・横書き、ライト・ダーク、文字サイズを切り替えられます。</p>
-      </section>
+      <div class="cover-actions">
+        <a class="primary-link" href="reader.html?chapter=01">最初から読む</a>
+        <a class="secondary-link" href="#toc">目次へ</a>
+      </div>
     </section>
 
-    <section class="chapter-panel" aria-labelledby="chapterHeading">
-      <div class="chapter-panel-header">
-        <h2 id="chapterHeading">目次</h2>
-        <p id="chapterCount">読み込み中</p>
-      </div>
-      <ol id="chapterList" class="cover-chapter-list">
-        <li>目次を読み込んでいます。</li>
-      </ol>
+    <section id="toc" class="toc-section" aria-labelledby="toc-title">
+      <h2 id="toc-title">目次</h2>
+      <ol id="toc-list" class="toc-list"></ol>
     </section>
   </main>
 
-  <footer class="cover-footer">
-    <button type="button" id="coverThemeToggle" class="control-button">ダーク</button>
+  <footer class="site-footer">
+    <button id="home-theme-toggle" class="plain-button" type="button">ダークモード</button>
   </footer>
-
-  <noscript>
-    <p class="noscript">このサイトは作品情報と目次の読み込みにJavaScriptを使用します。ブラウザのJavaScriptを有効にしてください。</p>
-  </noscript>
-
-  <script src="assets/cover.js?v=9" defer></script>
+  <script src="script.js"></script>
 </body>
 </html>
